@@ -2,25 +2,25 @@ package com.digdes.school;
 
 import java.util.*;
 /**
- * класс JavaSchoolStarter - Реализация некоторого подобия языка управления данными в коллекции.
- * @author Павлов В.А.
+ * РєР»Р°СЃСЃ JavaSchoolStarter - Р РµР°Р»РёР·Р°С†РёСЏ РЅРµРєРѕС‚РѕСЂРѕРіРѕ РїРѕРґРѕР±РёСЏ СЏР·С‹РєР° СѓРїСЂР°РІР»РµРЅРёСЏ РґР°РЅРЅС‹РјРё РІ РєРѕР»Р»РµРєС†РёРё.
+ * @author РџР°РІР»РѕРІ Р’.Рђ.
  */
 public class JavaSchoolStarter {
-    /**Поле для хранения таблицы с полями ID,LASTNAME,COST,AGE,ACTIVE*/
+    /**РџРѕР»Рµ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ С‚Р°Р±Р»РёС†С‹ СЃ РїРѕР»СЏРјРё ID,LASTNAME,COST,AGE,ACTIVE*/
     private List<Map<String,Object>> table = new ArrayList<Map<String, Object>>();
-    /**Дефолтный конструктор класса {@link JavaSchoolStarter}*/
+    /**Р”РµС„РѕР»С‚РЅС‹Р№ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РєР»Р°СЃСЃР° {@link JavaSchoolStarter}*/
     public JavaSchoolStarter() {
 
     }
-    /**На вход получает запрос, на выдает коллекцию, полученную после выполнения данного запроса
-     * @param request sql запрос
-     * @return коллекция, полученная после выполнения запроса */
+    /**Р РµР°Р»РёР·СѓРµС‚ РІС‹РїРѕР»РЅРµРЅРёРµ sql Р°РїСЂРѕСЃРѕРІ
+     * @param request sql Р·Р°РїСЂРѕСЃ
+     * @return РІС‹РґР°РµС‚ РєРѕР»Р»РµРєС†РёСЋ, СЃРѕСЃС‚РѕСЏС‰СѓСЋ РёР· РєРѕРїРёР№ СЃС‚СЂРѕРє, РЅР° РєРѕС‚РѕСЂС‹Рµ РїРѕРІР»РёСЏР» Р·Р°РїСЂРѕСЃ*/
     public List<Map<String,Object>> execute(String request) throws Exception {
         Komands komands = new Komands(request);
         switch (komands.keyWord){
             case "SELECT":
                 if(komands.whereUslovie==null){
-                    return table;
+                    return copyTable(table);
                 }else{
                     return select(komands.whereUslovie);
                 }
@@ -32,20 +32,50 @@ public class JavaSchoolStarter {
                 }
             case "DELETE":
                 if(komands.whereUslovie==null){
+                    List<Map<String,Object>> copyTable = copyTable(table);
                     table.clear();
-                    return table;
+                    return copyTable;
                 }else{
                     return delete(komands.whereUslovie);
                 }
             case "INSERT":
                 return insert(komands.valueUslovie);
         }
-        return new ArrayList<>();
+        throw new Exception();
     }
-    /**Перебирает все строки основной таблицы и иеняет в них значения по условию values
-     * @param values строка с значниями для замены в формате "ПОЛЕ значение ПОЛЕ значение..."
-     * @return основную таблицу в формате List<Map<String,Object>> с обновленными строками */
+    /**СЃРѕР·РґР°РµС‚ РІ РїР°РјСЏС‚Рё РєРѕРїРёСЋ РїРµСЂРµРґР°РЅРЅРѕР№ РєРѕР»Р»РµРєС†РёРё (С‚Р°Р±Р»РёС†С‹)
+     * @param table С‚Р°Р±Р»РёС†Р°, РєРѕС‚РѕСЂСѓСЋ РЅСѓР¶РЅРѕ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ
+     * @return РєРѕРїРёСЏ С‚Р°Р±Р»РёС†С‹*/
+    private List<Map<String,Object>> copyTable(List<Map<String,Object>> table){
+        List<Map<String,Object>> copyTable = new ArrayList<Map<String,Object>>();
+        for(int i=0;i<table.size();i++){
+            Map<String,Object> copyRow = new HashMap<>();
+            for(Map.Entry entry:table.get(i).entrySet()){
+                String key = (String) entry.getKey();
+                Object value = entry.getValue();
+                copyRow.put(key,value);
+            }
+            copyTable.add(copyRow);
+        }
+        return copyTable;
+    }
+    /**СЃРѕР·РґР°РµС‚ РІ РїР°РјСЏС‚Рё РєРѕРїРёСЋ РїРµСЂРµРґР°РЅРЅРѕР№ РєРѕР»Р»РµРєС†РёРё (СЃС‚СЂРѕРєРё)
+     * @param row СЃС‚СЂРѕРєР°, РєРѕС‚РѕСЂСѓСЋ РЅСѓР¶РЅРѕ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ
+     * @return РєРѕРїРёСЏ СЃС‚СЂРѕРєРё*/
+    private Map<String,Object> copyRow(Map<String,Object> row){
+            Map<String,Object> copyRow = new HashMap<>();
+            for(Map.Entry entry:row.entrySet()){
+                String key = (String) entry.getKey();
+                Object value = entry.getValue();
+                copyRow.put(key,value);
+            }
+        return copyRow;
+    }
+    /**РџРµСЂРµР±РёСЂР°РµС‚ РІСЃРµ СЃС‚СЂРѕРєРё РѕСЃРЅРѕРІРЅРѕР№ С‚Р°Р±Р»РёС†С‹ Рё РёР·РјРµРЅСЏРµС‚ РІ РЅРёС… Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓСЃР»РѕРІРёСЋ values
+     * @param values СЃС‚СЂРѕРєР° СЃ Р·РЅР°С‡РЅРёСЏРјРё РґР»СЏ Р·Р°РјРµРЅС‹ РІ С„РѕСЂРјР°С‚Рµ "РџРћР›Р• Р·РЅР°С‡РµРЅРёРµ РџРћР›Р• Р·РЅР°С‡РµРЅРёРµ..."
+     * @return РєРѕР»Р»РµРєС†РёСЋ РєРѕРїРёР№ СЃС‚СЂРѕРє, РІ РєРѕС‚РѕСЂС‹С… РїСЂРѕРёР·РѕС€Р»Рё РёР·РјРµРЅРµРЅРёСЏ РїРѕСЃР»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РїСЂРѕСЃР° */
     private List<Map<String,Object>> update(String values){
+        List<Map<String,Object>> table2 = new ArrayList<Map<String, Object>>();
         String[] arrayRequest=values.split(" ");
         for(int numberRow=0;numberRow<table.size();numberRow++){
             Map<String,Object> row = table.get(numberRow);
@@ -85,14 +115,16 @@ public class JavaSchoolStarter {
                 }
             }
             table.set(numberRow,row);
+            table2.add(row);
         }
-        return table;
+        return copyTable(table2);
     }
-    /**Перебирает все строки основной таблицы и иеняет значения по условию values в тех из них, которые удовлетворяют условию uslovieWhere
-     * @param values строка с значниями для замены в формате "ПОЛЕ значение ПОЛЕ значение..."
-     * @param uslovieWhere строка с условием блока where формата "поле=значениеANDполе=значение..."
-     * @return основную таблицу в формате List<Map<String,Object>> с обновленными строками */
+    /**РџРµСЂРµР±РёСЂР°РµС‚ РІСЃРµ СЃС‚СЂРѕРєРё РѕСЃРЅРѕРІРЅРѕР№ С‚Р°Р±Р»РёС†С‹ Рё РёРµРЅСЏРµС‚ Р·РЅР°С‡РµРЅРёСЏ РїРѕ СѓСЃР»РѕРІРёСЋ values РІ С‚РµС… РёР· РЅРёС…, РєРѕС‚РѕСЂС‹Рµ СѓРґРѕРІР»РµС‚РІРѕСЂСЏСЋС‚ СѓСЃР»РѕРІРёСЋ uslovieWhere
+     * @param values СЃС‚СЂРѕРєР° СЃ Р·РЅР°С‡РЅРёСЏРјРё РґР»СЏ Р·Р°РјРµРЅС‹ РІ С„РѕСЂРјР°С‚Рµ "РџРћР›Р• Р·РЅР°С‡РµРЅРёРµ РџРћР›Р• Р·РЅР°С‡РµРЅРёРµ..."
+     * @param uslovieWhere СЃС‚СЂРѕРєР° СЃ СѓСЃР»РѕРІРёРµРј Р±Р»РѕРєР° where С„РѕСЂРјР°С‚Р° "РїРѕР»Рµ=Р·РЅР°С‡РµРЅРёРµANDРїРѕР»Рµ=Р·РЅР°С‡РµРЅРёРµ..."
+     * @return РєРѕР»Р»РµРєС†РёСЋ РєРѕРїРёР№ СЃС‚СЂРѕРє, РІ РєРѕС‚РѕСЂС‹С… РїСЂРѕРёР·РѕС€Р»Рё РёР·РјРµРЅРµРЅРёСЏ РїРѕСЃР»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РїСЂРѕСЃР° */
     private List<Map<String,Object>> updateWhere(String values,String uslovieWhere) throws Exception {
+        List<Map<String,Object>> table2 = new ArrayList<Map<String, Object>>();
         String[] arrayRequest=values.split(" ");
         for(int numberRow=0;numberRow<table.size();numberRow++){
             if (where(uslovieWhere,table.get(numberRow))) {
@@ -133,27 +165,29 @@ public class JavaSchoolStarter {
                         default:throw new Exception();
                     }
                 }
-                table.set(numberRow, row);
+                table2.add(row);
             }
         }
-        return table;
+        return copyTable(table2);
     }
-    /**Удаляет из основной таблицы строки удовлетворяющие пререданному цчловию
-     * @param request строка с условием блока where формата "поле=значениеANDполе=значение..."
-     * @return основную таблицу в формате List<Map<String,Object>> после удаления необходимых строк */
+    /**РЈРґР°Р»СЏРµС‚ РёР· РѕСЃРЅРѕРІРЅРѕР№ С‚Р°Р±Р»РёС†С‹ СЃС‚СЂРѕРєРё СѓРґРѕРІР»РµС‚РІРѕСЂСЏСЋС‰РёРµ РїСЂРµСЂРµРґР°РЅРЅРѕРјСѓ СѓСЃР»РѕРІРёСЋ
+     * @param request СЃС‚СЂРѕРєР° СЃ СѓСЃР»РѕРІРёРµРј Р±Р»РѕРєР° where С„РѕСЂРјР°С‚Р° "РїРѕР»Рµ=Р·РЅР°С‡РµРЅРёРµANDРїРѕР»Рµ=Р·РЅР°С‡РµРЅРёРµ..."
+     * @return РєРѕР»Р»РµРєС†РёСЋ РєРѕРїРёР№ СЃС‚СЂРѕРє, РєРѕС‚РѕСЂС‹Рµ Р±С‹Р»Рё СѓРґР°Р»РµРЅС‹ РїРѕСЃР»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ Р·Р°РїСЂРѕСЃР° */
     private List<Map<String,Object>> delete(String request) throws Exception {
+        List<Map<String,Object>> table2 = new ArrayList<Map<String, Object>>();
         for(int numberRow=0;numberRow<table.size();numberRow++){
             if(where(request,table.get(numberRow))){
+                table2.add(copyRow(table.get(numberRow)));
                 table.remove(numberRow);
                 numberRow--;
             }
         }
-        return table;
+        return copyTable(table2);
     }
-    /**Добавляет в основную таблицу новую строку
-     * @param request строка с условием формата "ПОЛЕ значение ПОЛЕ значение..."
-     * @return основную таблицу в формате List<Map<String,Object>> с добавленной строкой */
-    private List<Map<String,Object>> insert(String request) throws Exception {
+    /**Р”РѕР±Р°РІР»СЏРµС‚ РІ РѕСЃРЅРѕРІРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ РЅРѕРІСѓСЋ СЃС‚СЂРѕРєСѓ
+     * @param request СЃС‚СЂРѕРєР° СЃ СѓСЃР»РѕРІРёРµРј С„РѕСЂРјР°С‚Р° "РџРћР›Р• Р·РЅР°С‡РµРЅРёРµ РџРћР›Р• Р·РЅР°С‡РµРЅРёРµ..."
+     * @return РєРѕР»Р»РµРєС†РёСЋ СЃ РєРѕРїРёРµР№ СЃС‚СЂРѕРєРё, РєРѕС‚РѕСЂР°СЏ РґРѕР±Р°РІР»РµРЅР° РІ РѕСЃРЅРѕРІРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ*/
+    private  List<Map<String,Object>> insert(String request) throws Exception {
         Map<String,Object> row = new HashMap<>();
         String[] arrayRequest=request.split(" ");
         for(int i=0;i<arrayRequest.length;i+=2){
@@ -182,23 +216,25 @@ public class JavaSchoolStarter {
             }
         }
         table.add(row);
-        return table;
+        List<Map<String,Object>> table2 = new ArrayList<Map<String,Object>>();
+        table2.add(row);
+        return copyTable(table2);
     }
-    /**Выбирает из основной таблицы строки, которые подходят условию блока where
-     * @param uslovie принимает фарматированную строку с условием блока where
-     * @return Коллекию из подходящих строк из общей таблицы*/
+    /**Р’С‹Р±РёСЂР°РµС‚ РёР· РѕСЃРЅРѕРІРЅРѕР№ С‚Р°Р±Р»РёС†С‹ СЃС‚СЂРѕРєРё, РєРѕС‚РѕСЂС‹Рµ РїРѕРґС…РѕРґСЏС‚ СѓСЃР»РѕРІРёСЋ Р±Р»РѕРєР° where
+     * @param uslovie РїСЂРёРЅРёРјР°РµС‚ С„Р°СЂРјР°С‚РёСЂРѕРІР°РЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ СЃ СѓСЃР»РѕРІРёРµРј Р±Р»РѕРєР° where
+     * @return РєРѕР»Р»РµРєС†РёСЋ РєРѕРїРёР№ СЃС‚СЂРѕРє, РєРѕС‚РѕСЂС‹Рµ РїРѕРґС…РѕРґСЏС‚ РїРѕРґ СѓСЃР»РѕРІРёРµ Р±Р»РѕРєР° where*/
     private List<Map<String,Object>> select(String uslovie) throws Exception {
         List<Map<String,Object>> newTable = new ArrayList<Map<String, Object>>();
         for(int row=0;row<table.size();row++){
             if(where(uslovie,table.get(row))) newTable.add(table.get(row));
         }
-        return newTable;
+        return copyTable(newTable);
     }
 
-    /**Разбивает условие where на функции и орпеделяет его истинность приминительно к переданной строке
-     * @param uslovie принимает фарматированную строку с условием блока where
-     * @param row принимает коллекцию map, которая является строкой таблицы-коллекции
-     * @return true, если строка row удовлетваряет условию uslovie"*/
+    /**Р Р°Р·Р±РёРІР°РµС‚ СѓСЃР»РѕРІРёРµ where РЅР° С„СѓРЅРєС†РёРё Рё РѕСЂРїРµРґРµР»СЏРµС‚ РµРіРѕ РёСЃС‚РёРЅРЅРѕСЃС‚СЊ РїСЂРёРјРёРЅРёС‚РµР»СЊРЅРѕ Рє РїРµСЂРµРґР°РЅРЅРѕР№ СЃС‚СЂРѕРєРµ
+     * @param uslovie РїСЂРёРЅРёРјР°РµС‚ С„Р°СЂРјР°С‚РёСЂРѕРІР°РЅРЅСѓСЋ СЃС‚СЂРѕРєСѓ СЃ СѓСЃР»РѕРІРёРµРј Р±Р»РѕРєР° where
+     * @param row РїСЂРёРЅРёРјР°РµС‚ РєРѕР»Р»РµРєС†РёСЋ map, РєРѕС‚РѕСЂР°СЏ СЏРІР»СЏРµС‚СЃСЏ СЃС‚СЂРѕРєРѕР№ С‚Р°Р±Р»РёС†С‹-РєРѕР»Р»РµРєС†РёРё
+     * @return true, РµСЃР»Рё СЃС‚СЂРѕРєР° row СѓРґРѕРІР»РµС‚РІР°СЂСЏРµС‚ СѓСЃР»РѕРІРёСЋ uslovie"*/
     private boolean where(String uslovie, Map<String,Object> row) throws Exception {
         if(uslovie.indexOf("OR")!=-1)
             return or(uslovie,row);
@@ -318,7 +354,7 @@ public class JavaSchoolStarter {
             } else
                 return Double.parseDouble(String.valueOf(row.get(one))) > Double.parseDouble(two);
         }
-        if(uslovie.indexOf("=")!=-1){//изменить для разных типов
+        if(uslovie.indexOf("=")!=-1){//РёР·РјРµРЅРёС‚СЊ РґР»СЏ СЂР°Р·РЅС‹С… С‚РёРїРѕРІ
             String one = uslovie.split("=")[0].toUpperCase(Locale.ROOT);
             String two = uslovie.split("=")[1];
             if(row.get(one)==null)return false;
@@ -335,18 +371,18 @@ public class JavaSchoolStarter {
 
 
     /**
-     * класс Komands - вложенный класс класса {@link JavaSchoolStarter}; Хранит sql запрос, который разделен на улючевое слово, условие, условие where
-     * @author Павлов В.А.
+     * РєР»Р°СЃСЃ Komands - РІР»РѕР¶РµРЅРЅС‹Р№ РєР»Р°СЃСЃ РєР»Р°СЃСЃР° {@link JavaSchoolStarter}; РҐСЂР°РЅРёС‚ sql Р·Р°РїСЂРѕСЃ, РєРѕС‚РѕСЂС‹Р№ СЂР°Р·РґРµР»РµРЅ РЅР° СѓР»СЋС‡РµРІРѕРµ СЃР»РѕРІРѕ, СѓСЃР»РѕРІРёРµ, СѓСЃР»РѕРІРёРµ where
+     * @author РџР°РІР»РѕРІ Р’.Рђ.
      */
     private class Komands{
-        /**Поле для хранеения sql-команды*/
+        /**РџРѕР»Рµ РґР»СЏ С…СЂР°РЅРµРµРЅРёСЏ sql-РєРѕРјР°РЅРґС‹*/
         String keyWord;
-        /**Поле для хранения условия запроса в формате "ПОЛЕ значение ПОЛЕ значение..."*/
+        /**РџРѕР»Рµ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СѓСЃР»РѕРІРёСЏ Р·Р°РїСЂРѕСЃР° РІ С„РѕСЂРјР°С‚Рµ "РџРћР›Р• Р·РЅР°С‡РµРЅРёРµ РџРћР›Р• Р·РЅР°С‡РµРЅРёРµ..."*/
         String valueUslovie;
-        /**Поле для хранения условия where в формате "поле=значениеANDполе=значение..."*/
+        /**РџРѕР»Рµ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СѓСЃР»РѕРІРёСЏ where РІ С„РѕСЂРјР°С‚Рµ "РїРѕР»Рµ=Р·РЅР°С‡РµРЅРёРµANDРїРѕР»Рµ=Р·РЅР°С‡РµРЅРёРµ..."*/
         String whereUslovie;
-        /**Создает класс с sql запросом расделенным на слово-запрос, условие запроса, условие брока where
-         * @param line - строка c sql запросом*/
+        /**РЎРѕР·РґР°РµС‚ РєР»Р°СЃСЃ СЃ sql Р·Р°РїСЂРѕСЃРѕРј СЂР°СЃРґРµР»РµРЅРЅС‹Рј РЅР° СЃР»РѕРІРѕ-Р·Р°РїСЂРѕСЃ, СѓСЃР»РѕРІРёРµ Р·Р°РїСЂРѕСЃР°, СѓСЃР»РѕРІРёРµ Р±СЂРѕРєР° where
+         * @param line - СЃС‚СЂРѕРєР° c sql Р·Р°РїСЂРѕСЃРѕРј*/
         public Komands(String line){
             line=line.trim();
             if(line.indexOf(" ")==-1){
@@ -371,9 +407,9 @@ public class JavaSchoolStarter {
             }
 
         }
-        /**Форматирует строку основного запроса
-         * @param request принимает строку запроса с лишними пробелами, запятыми
-         *  @return значение строку-запрос в формате "ПОЛЕ=значение ПОЛЕ=значение..."*/
+        /**Р¤РѕСЂРјР°С‚РёСЂСѓРµС‚ СЃС‚СЂРѕРєСѓ РѕСЃРЅРѕРІРЅРѕРіРѕ Р·Р°РїСЂРѕСЃР°
+         * @param request РїСЂРёРЅРёРјР°РµС‚ СЃС‚СЂРѕРєСѓ Р·Р°РїСЂРѕСЃР° СЃ Р»РёС€РЅРёРјРё РїСЂРѕР±РµР»Р°РјРё, Р·Р°РїСЏС‚С‹РјРё
+         *  @return Р·РЅР°С‡РµРЅРёРµ СЃС‚СЂРѕРєСѓ-Р·Р°РїСЂРѕСЃ РІ С„РѕСЂРјР°С‚Рµ "РџРћР›Р•=Р·РЅР°С‡РµРЅРёРµ РџРћР›Р•=Р·РЅР°С‡РµРЅРёРµ..."*/
         private String upRegistrKeyValueForValue(String request){
             request=request.replaceAll("'","");
             String[]strings = request.split(",");
@@ -392,9 +428,9 @@ public class JavaSchoolStarter {
             }
             return request.trim();
         }
-        /**Форматирует строку блока WHERE
-         * @param request принимает строку запроса с лишними пробелами, запятыми
-         *  @return значение строку-запрос в формате "поле=значениеANDполе=значение..."*/
+        /**Р¤РѕСЂРјР°С‚РёСЂСѓРµС‚ СЃС‚СЂРѕРєСѓ Р±Р»РѕРєР° WHERE
+         * @param request РїСЂРёРЅРёРјР°РµС‚ СЃС‚СЂРѕРєСѓ Р·Р°РїСЂРѕСЃР° СЃ Р»РёС€РЅРёРјРё РїСЂРѕР±РµР»Р°РјРё, Р·Р°РїСЏС‚С‹РјРё
+         *  @return Р·РЅР°С‡РµРЅРёРµ СЃС‚СЂРѕРєСѓ-Р·Р°РїСЂРѕСЃ РІ С„РѕСЂРјР°С‚Рµ "РїРѕР»Рµ=Р·РЅР°С‡РµРЅРёРµANDРїРѕР»Рµ=Р·РЅР°С‡РµРЅРёРµ..."*/
         private String upRegistrKeyValueForWhere(String request){
             request=request.replaceAll("'","").trim();
             String[]strings = request.split(" ");
